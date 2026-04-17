@@ -22,6 +22,15 @@ in Korean and English, built with a global launch in mind.*
   </tr>
 </table>
 
+<table align="center">
+  <tr>
+    <td align="center"><img src="images/built5.gif" width="200" height="400"/></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Notification</strong></td>
+  </tr>
+</table>
+
 ---
 
 ## Table of Contents
