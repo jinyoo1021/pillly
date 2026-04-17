@@ -7,12 +7,20 @@ backend API, Flutter mobile app, and automated push notification delivery.
 *The name comes from "pill" + the repetitive suffix "-ly" — same pronunciation
 in Korean and English, built with a global launch in mind.*
 
-<p align="center">
-  <img src="images/built1.gif" width="23%"/>
-  <img src="images/built2.gif" width="23%"/>
-  <img src="images/built3.gif" width="23%"/>
-  <img src="images/built4.gif" width="23%"/>
-</p>
+<table align="center">
+  <tr>
+    <td align="center"><img src="images/built1.gif" width="200" height="400"/></td>
+    <td align="center"><img src="images/built2.gif" width="200" height="400"/></td>
+    <td align="center"><img src="images/built3.gif" width="200" height="400"/></td>
+    <td align="center"><img src="images/built4.gif" width="200" height="400"/></td>
+  </tr>
+  <tr>
+    <td align="center">Home</td>
+    <td align="center">Add & Edit</td>
+    <td align="center">History Calendar</td>
+    <td align="center">Stats</td>
+  </tr>
+</table>
 
 ---
 
