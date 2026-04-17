@@ -9,10 +9,10 @@ in Korean and English, built with a global launch in mind.*
 
 <table align="center">
   <tr>
-    <td align="center"><img src="images/built1.gif" width="200" height="400"/></td>
-    <td align="center"><img src="images/built2.gif" width="200" height="400"/></td>
-    <td align="center"><img src="images/built3.gif" width="200" height="400"/></td>
-    <td align="center"><img src="images/built4.gif" width="200" height="400"/></td>
+    <td align="center"><img src="images/built1.gif" width="180" height="360"/></td>
+    <td align="center"><img src="images/built2.gif" width="180" height="360"/></td>
+    <td align="center"><img src="images/built3.gif" width="180" height="360"/></td>
+    <td align="center"><img src="images/built4.gif" width="180" height="360"/></td>
   </tr>
   <tr>
     <td align="center">Home</td>
