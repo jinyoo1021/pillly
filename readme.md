@@ -43,6 +43,8 @@ in Korean and English, built with a global launch in mind.*
 - [Key decisions and what I learned](#key-decisions-and-what-i-learned)
 - [Limitations](#limitations)
 - [Development timeline](#development-timeline)
+- **[Why did this fail](#why-did-this-fail)**
+- **[So what I learned](#so-what-i-learned)**
 
 ---
 
@@ -267,3 +269,43 @@ datasets and only surfaced when thinking through production query counts.
 | 9 | QStash auto-scheduling, JWT webhook verification, KST → UTC cron conversion, final deployment |
 
 For the full engineering detail behind each phase, see the devlogs in [`devlog/`](./devlog/).
+
+---
+
+## _Why did this fail_
+
+It failed because the reliability requirements of a medication reminder app were higher than what my initial infrastructure and architecture could consistently guarantee.
+
+**I optimized for $0 cost too early.**
+I committed to a fully free stack from day one — Render, Supabase, and Upstash free tiers — with a planned upgrade path as users grew. In hindsight, free-tier constraints aren't just cost limits. They're reliability limits. Supabase pauses the database after 7 days of inactivity. QStash caps at 500 messages per day. Choosing this stack meant accepting those ceilings as operational realities before the product had proven it needed to exist.
+
+**Render free-tier cold starts hurt time-critical notifications.**
+Render's free plan sleeps after 15 minutes of inactivity. The architecture doc flagged this on day two and noted UptimeRobot pings as the mitigation — but that mitigation was never confirmed as running. QStash fires its webhook at exactly the scheduled time. A sleeping server adds a 20–30 second cold start before the notification can be sent. A late medication reminder is nearly as bad as no reminder at all.
+
+**Free-tier limits became a product limit.**
+QStash's daily message cap and other free-plan quotas made scale and consistency fragile even at small user counts. Interval schedules made this worse: because QStash has no native "every N days" support, I used daily triggers with server-side filtering. Filtered calls still consumed the daily quota, so interval users burned headroom without receiving a notification — accelerating the rate at which the cap became a real constraint.
+
+**The notification path was too complex for the stage.**
+`QStash → webhook → API auth / signature check → FCM / APNs → local notification / actions` — five hops, each capable of failing silently. A sleeping server, a paused database, a failed background isolate re-initialization, or a stale FCM token could each drop a notification with no signal to the user. Adding interactive lock-screen actions on top of this made the path more capable on paper and more fragile in practice.
+
+**Token lifecycle and device-state handling were incomplete.**
+Stale tokens after reinstall, single-device assumptions, and no token pruning strategy meant delivery reliability degraded over time without any visible signal. Firebase returns `registration-token-not-registered` for dead tokens, but the notification service had no handler — the failure was logged as delivered and ignored. A user who reinstalled the app would silently stop receiving reminders.
+
+---
+
+## _So what I learned_
+
+**Cost optimization and reliability optimization are different problems.**
+Choosing a free stack is a reasonable decision. Treating free-tier limits as problems to solve later — in a product where reliability is the core value — is not. The question I should have asked before choosing the infrastructure was not "how much does this cost" but "can this consistently guarantee the core feature."
+
+**A documented risk with an unconfirmed mitigation is not a managed risk.**
+The Render sleep issue was identified on day two and a mitigation was written down. But writing it down and confirming it works are different things. Recognizing a risk doesn't mean it's resolved. An unconfirmed mitigation silently accumulates as debt beneath every decision built on top of it.
+
+**Pipeline complexity must match infrastructure reliability.**
+A five-hop notification chain where any link can fail silently only makes sense when each layer offers strong reliability guarantees. Building that pipeline on free-tier services — each with its own sleep behavior, quota limit, and availability caveat — was a mismatch between the architecture's ambition and the infrastructure's guarantees. Complex structures only deliver complex value on a foundation that can be trusted.
+
+**When infrastructure is the product, mock tests give false confidence.**
+Mocking external services is the right approach for business logic. But when the product's value is a notification arriving on a real device at exactly the right time, tests that mock FCM and skip QStash signature verification aren't testing what matters. A green test suite is not the same as a working system.
+
+**Prove the core loop first, then build everything else.**
+The notification pipeline — the single feature the entire product depends on — was the last thing integrated and the least validated under real operating conditions. The right sequence would have been: prove that a real push notification arrives on a real device at the right time, then build the rest of the app on top of that verified foundation. The reliability of the core feature should be the first condition, not the last step.
