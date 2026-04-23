@@ -268,7 +268,7 @@ datasets and only surfaced when thinking through production query counts.
 | 8 | Testing (68 unit + widget tests), bug fixes, FCM integration |
 | 9 | QStash auto-scheduling, JWT webhook verification, KST → UTC cron conversion, final deployment |
 
-For the full engineering detail behind each phase, see the devlogs in [`devlog/`](./devlog/).
+For the full engineering detail behind each phase, see the devlogs in [`devlog/`](https://jinyoo1021.notion.site/Pilly-Devlog-32759cb52c8b8064a87de9d5676856d8?source=copy_link).
 
 ---
 
